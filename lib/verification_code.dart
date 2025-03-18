@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:jkskillapp/enter_new_password.dart';
 import 'package:jkskillapp/signin.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
@@ -12,6 +13,34 @@ class VerificationCode extends StatefulWidget {
 }
 
 class _VerificationCodeState extends State<VerificationCode> {
+  final TextEditingController newpasswordController = TextEditingController();
+  final TextEditingController confirmpasswordController = TextEditingController();
+
+  void newpassword() async {
+    var url = Uri.http('localhost:4000', '/verify-otp');
+    var response = await http.post(
+      url,
+      body: {
+        'newPassword': newpasswordController.text,
+        'confirmPassword': confirmpasswordController.text,
+      },
+    );
+    if (response.statusCode == 200) {ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Password Updated Successfully!")),
+    );
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Signin()),
+
+    );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Password does not match!")),
+      );
+    }
+    print('Response status: ${response.statusCode == 200}');
+    print('Response body: ${response.body}');
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:jkskillapp/home.dart';
 import 'package:jkskillapp/signin.dart';
 import 'package:jkskillapp/verification_code.dart';
@@ -13,6 +14,25 @@ class ForgetPassword extends StatefulWidget {
 }
 
 class _ForgetPasswordState extends State<ForgetPassword> {
+  final TextEditingController emailController = TextEditingController();
+
+  void verificationcode() async {
+    var url = Uri.http('localhost:4000','/email-verify/otp');
+    var response = await http.post(url, body: {'email': emailController.text});
+    if (response.statusCode == 200) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => VerificationCode()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Something went wrong please try again")),
+      );
+    }
+    print('Response status: ${response.statusCode == 200}');
+    print('Response body: ${response.body}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,6 +85,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                   color: Color(0xffd9d9d9),
                 ),
                 child: TextField(
+                  controller: emailController,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     prefixIcon: Icon(CupertinoIcons.mail, size: 25),
@@ -75,18 +96,25 @@ class _ForgetPasswordState extends State<ForgetPassword> {
             Positioned(
               top: 350,
               right: MediaQuery.of(context).size.width * 0.31,
-              child: InkWell(onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>Signin()));},
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Signin()),
+                  );
+                },
                 child: Text(
                   "Back to Sign In",
                   style: GoogleFonts.besley(
-                    fontSize: 15, color: Color(0xff0b1345),
+                    fontSize: 15,
+                    color: Color(0xff0b1345),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
             ),
             Positioned(
-              bottom:  MediaQuery.of(context).size.height * 0.43,
+              bottom: MediaQuery.of(context).size.height * 0.43,
               left: MediaQuery.of(context).size.width * 0.28,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(42),
@@ -94,7 +122,9 @@ class _ForgetPasswordState extends State<ForgetPassword> {
                   height: 54,
                   minWidth: 194,
                   textColor: Colors.white,
-                  onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context)=>VerificationCode()));},
+                  onPressed: () {
+                    verificationcode();
+                  },
                   child: Text(
                     "Send",
                     style: GoogleFonts.besley(

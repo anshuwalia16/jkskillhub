@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:jkskillapp/home.dart';
 import 'package:jkskillapp/signin.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert' as convert;
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -12,6 +14,33 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController Email_idController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController ageController = TextEditingController();
+  void signup() async {
+    var url = Uri.http('localhost:4000','/signup');
+    var response = await http.post(
+      url,
+      body: {
+        'username': usernameController.text,
+        'email': Email_idController.text,
+        'password': passwordController.text,
+        'age': ageController.text,
+      },
+    );
+    if (response.statusCode == 200) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Something went wrong please try again")),
+      );
+    }
+
+    print('Response status: ${response.statusCode == 200}');
+    print('Response body: ${response.body}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,7 +51,7 @@ class _SignupState extends State<Signup> {
               "assets/Forget password.png",
               fit: BoxFit.fill,
               height: MediaQuery.of(context).size.height,
-              width:  MediaQuery.of(context).size.width,
+              width: MediaQuery.of(context).size.width,
             ),
             Positioned(
               right: 20,
@@ -40,7 +69,7 @@ class _SignupState extends State<Signup> {
                 ),
               ),
             ),
-        
+
             Positioned(
               top: 160,
               right: MediaQuery.of(context).size.width * 0.2,
@@ -75,9 +104,13 @@ class _SignupState extends State<Signup> {
                   color: Color(0xffd9d9d9),
                 ),
                 child: TextField(
+                  controller: usernameController,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    prefixIcon: Icon(CupertinoIcons.person_alt_circle, size: 25),
+                    prefixIcon: Icon(
+                      CupertinoIcons.person_alt_circle,
+                      size: 25,
+                    ),
                   ),
                 ),
               ),
@@ -105,6 +138,7 @@ class _SignupState extends State<Signup> {
                   color: Color(0xffd9d9d9),
                 ),
                 child: TextField(
+                  controller: Email_idController,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     prefixIcon: Icon(CupertinoIcons.mail, size: 30),
@@ -134,7 +168,8 @@ class _SignupState extends State<Signup> {
                   borderRadius: BorderRadius.circular(32),
                   color: Color(0xffd9d9d9),
                 ),
-                child: TextField(
+                child: TextField(obscureText: true,
+                  controller: passwordController,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     prefixIcon: Icon(CupertinoIcons.lock_shield_fill, size: 30),
@@ -165,6 +200,7 @@ class _SignupState extends State<Signup> {
                   color: Color(0xffd9d9d9),
                 ),
                 child: TextField(
+                  controller: ageController,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     prefixIcon: Icon(CupertinoIcons.hourglass, size: 30),
@@ -172,7 +208,7 @@ class _SignupState extends State<Signup> {
                 ),
               ),
             ),
-        
+
             Positioned(
               bottom: MediaQuery.of(context).size.height * 0.22,
               left: MediaQuery.of(context).size.width * 0.28,
@@ -182,7 +218,9 @@ class _SignupState extends State<Signup> {
                   height: 50,
                   minWidth: 194,
                   textColor: Colors.white,
-                  onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context)=>Signin()));},
+                  onPressed: () {
+                    signup();
+                  },
                   child: Text(
                     "Sign Up",
                     style: GoogleFonts.besley(
@@ -208,18 +246,22 @@ class _SignupState extends State<Signup> {
               ),
             ),
             Positioned(
-              bottom:  MediaQuery.of(context).size.height * 0.14,
+              bottom: MediaQuery.of(context).size.height * 0.14,
               left: MediaQuery.of(context).size.width * 0.3,
               child: Row(
                 children: [
                   Image.asset("assets/google_icon .png", height: 40, width: 60),
-                  Image.asset("assets/linkedin-logo.png", height: 30, width: 60),
+                  Image.asset(
+                    "assets/linkedin-logo.png",
+                    height: 30,
+                    width: 60,
+                  ),
                   Image.asset("assets/gmail.png", height: 30, width: 60),
                 ],
               ),
             ),
             Positioned(
-              bottom: MediaQuery.of(context).size.height *0.09,
+              bottom: MediaQuery.of(context).size.height * 0.09,
               left: MediaQuery.of(context).size.width * 0.26,
               child: Text(
                 "already have an account ",
@@ -230,11 +272,17 @@ class _SignupState extends State<Signup> {
                 ),
               ),
             ),
-            SizedBox(height: 8,),
+            SizedBox(height: 8),
             Positioned(
-              bottom: MediaQuery.of(context).size.height *0.06,
+              bottom: MediaQuery.of(context).size.height * 0.06,
               left: MediaQuery.of(context).size.width * 0.42,
-              child: InkWell(onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>Signin()));},
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Signin()),
+                  );
+                },
                 child: Text(
                   "Sign In ",
                   style: GoogleFonts.besley(

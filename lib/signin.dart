@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:jkskillapp/forget_password.dart';
 import 'package:jkskillapp/home.dart';
 import 'package:jkskillapp/signup.dart';
+import 'package:http/http.dart';
 
 class Signin extends StatefulWidget {
   const Signin({super.key});
@@ -13,6 +15,28 @@ class Signin extends StatefulWidget {
 }
 
 class _SigninState extends State<Signin> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  void signin() async {
+    var url = Uri.http('localhost:4000', '/login');
+    var response = await http.post(
+      url,
+      body: {
+        'email': emailController.text,
+        'password': passwordController.text,
+      },
+    );
+    if (response.statusCode == 200) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) => Home()));
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Something went wrong please try again")),
+      );
+    }
+    print('Response status: ${response.statusCode == 200}');
+    print('Response body: ${response.body}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,7 +47,7 @@ class _SigninState extends State<Signin> {
               "assets/Forget password.png",
               fit: BoxFit.fill,
               height: MediaQuery.of(context).size.height,
-              width:  MediaQuery.of(context).size.width,
+              width: MediaQuery.of(context).size.width,
             ),
             Positioned(
               right: 20,
@@ -76,6 +100,7 @@ class _SigninState extends State<Signin> {
                   color: Color(0xffd9d9d9),
                 ),
                 child: TextField(
+                  controller: emailController,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     prefixIcon: Icon(CupertinoIcons.mail, size: 25),
@@ -105,7 +130,8 @@ class _SigninState extends State<Signin> {
                   borderRadius: BorderRadius.circular(32),
                   color: Color(0xffd9d9d9),
                 ),
-                child: TextField(
+                child: TextField(obscureText: true,
+                  controller: passwordController,
                   decoration: InputDecoration(
                     border: InputBorder.none,
                     prefixIcon: Icon(CupertinoIcons.lock_shield_fill, size: 30),
@@ -116,7 +142,13 @@ class _SigninState extends State<Signin> {
             Positioned(
               top: 480,
               left: MediaQuery.of(context).size.width * 0.6,
-              child: InkWell(onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>ForgetPassword()));},
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ForgetPassword()),
+                  );
+                },
                 child: Text(
                   "forget password?",
                   style: GoogleFonts.besley(
@@ -128,7 +160,7 @@ class _SigninState extends State<Signin> {
               ),
             ),
             Positioned(
-              bottom:  MediaQuery.of(context).size.height * 0.25,
+              bottom: MediaQuery.of(context).size.height * 0.25,
               left: MediaQuery.of(context).size.width * 0.28,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(42),
@@ -136,7 +168,9 @@ class _SigninState extends State<Signin> {
                   height: 54,
                   minWidth: 194,
                   textColor: Colors.white,
-                  onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context)=>Home()));},
+                  onPressed: () {
+                   signin();
+                  },
                   child: Text(
                     "LOGIN",
                     style: GoogleFonts.besley(
@@ -150,7 +184,7 @@ class _SigninState extends State<Signin> {
               ),
             ),
             Positioned(
-              bottom:  MediaQuery.of(context).size.height * 0.19,
+              bottom: MediaQuery.of(context).size.height * 0.19,
               left: MediaQuery.of(context).size.width * 0.25,
               child: Text(
                 "or login using social media",
@@ -162,21 +196,31 @@ class _SigninState extends State<Signin> {
               ),
             ),
             Positioned(
-              bottom:  MediaQuery.of(context).size.height * 0.14,
+              bottom: MediaQuery.of(context).size.height * 0.14,
               left: MediaQuery.of(context).size.width * 0.3,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Image.asset("assets/google_icon .png", height: 40, width: 60),
-                  Image.asset("assets/linkedin-logo.png", height: 30, width: 60),
+                  Image.asset(
+                    "assets/linkedin-logo.png",
+                    height: 30,
+                    width: 60,
+                  ),
                   Image.asset("assets/gmail.png", height: 30, width: 60),
                 ],
               ),
             ),
             Positioned(
-              bottom:  MediaQuery.of(context).size.height * 0.07,
+              bottom: MediaQuery.of(context).size.height * 0.07,
               left: MediaQuery.of(context).size.width * 0.3,
-              child: InkWell(onTap: (){Navigator.push(context, MaterialPageRoute(builder: (context)=>Signup()));},
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => Signup()),
+                  );
+                },
                 child: Text(
                   "Create a New Account!",
                   style: GoogleFonts.besley(

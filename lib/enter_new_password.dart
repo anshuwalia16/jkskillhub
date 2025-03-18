@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
 import 'package:jkskillapp/signin.dart';
+
 class EnterNewPassword extends StatefulWidget {
   const EnterNewPassword({super.key});
 
@@ -10,6 +12,35 @@ class EnterNewPassword extends StatefulWidget {
 }
 
 class _EnterNewPasswordState extends State<EnterNewPassword> {
+  final TextEditingController newpasswordController = TextEditingController();
+  final TextEditingController confirmpasswordController = TextEditingController();
+
+  void newpassword() async {
+    var url = Uri.http('localhost:4000', '/reset-password');
+    var response = await http.post(
+      url,
+      body: {
+        'newPassword': newpasswordController.text,
+        'confirmPassword': confirmpasswordController.text,
+      },
+    );
+    if (response.statusCode == 200) {ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(backgroundColor:Colors.blue,content: Text("Password Updated Successfully!")),
+    );
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Signin()),
+
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Password does not match!")),
+      );
+    }
+    print('Response status: ${response.statusCode == 200}');
+    print('Response body: ${response.body}');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,13 +93,16 @@ class _EnterNewPasswordState extends State<EnterNewPassword> {
                   color: Color(0xffd9d9d9),
                 ),
                 child: TextField(
+                  controller: newpasswordController,
+                  obscureText: true,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    prefixIcon: Icon(CupertinoIcons.mail, size: 25),
+                    prefixIcon: Icon(CupertinoIcons.lock_shield_fill, size: 25),
                   ),
                 ),
               ),
-            ),Positioned(
+            ),
+            Positioned(
               top: 330,
               right: MediaQuery.of(context).size.width * 0.53,
               child: Text(
@@ -91,9 +125,11 @@ class _EnterNewPasswordState extends State<EnterNewPassword> {
                   color: Color(0xffd9d9d9),
                 ),
                 child: TextField(
+                  controller: confirmpasswordController,
+                  obscureText: true,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    prefixIcon: Icon(CupertinoIcons.mail, size: 25),
+                    prefixIcon: Icon(CupertinoIcons.lock_shield_fill, size: 25),
                   ),
                 ),
               ),
@@ -108,12 +144,7 @@ class _EnterNewPasswordState extends State<EnterNewPassword> {
                   minWidth: 194,
                   textColor: Colors.white,
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Signin(),
-                      ),
-                    );
+                    newpassword();
                   },
                   child: Text(
                     "Send",
@@ -127,7 +158,6 @@ class _EnterNewPasswordState extends State<EnterNewPassword> {
                 ),
               ),
             ),
-        
           ],
         ),
       ),
